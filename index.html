@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tic-Tac-Toe P2P</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <h1 class="title">Tic-Tac-Toe P2P</h1>
+
+    <div class="controls">
+      <button id="createBtn" class="btn primary">Create Group</button>
+      <button id="joinBtn" class="btn secondary">Join Group</button>
+      <input type="text" id="codeInput" placeholder="Paste code here" />
+    </div>
+
+    <div id="status" class="status">Offline</div>
+
+    <div class="board" id="board">
+      <!-- 9 cells dynamically generated -->
+    </div>
+  </div>
+
+  <template id="cellTemplate">
+    <div class="cell"></div>
+  </template>
+
+  <script src="app.js"></script>
+</body>
+</html>
