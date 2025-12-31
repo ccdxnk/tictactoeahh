@@ -125,8 +125,8 @@ async function initConnection(isCreator, remoteCode = '') {
     };
   }
 
-  peerConnection.onicecandidate = (e) => {
-    if (!e.candidate) {
+  peerConnection.onicegatheringstatechange = () => {
+    if (peerConnection.iceGatheringState === 'complete') {
       const code = JSON.stringify(peerConnection.localDescription);
       navigator.clipboard.writeText(code);
       if (isCreator) {
