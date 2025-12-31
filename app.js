@@ -6,6 +6,7 @@ const createBtn = document.getElementById('createBtn');
 const joinBtn = document.getElementById('joinBtn');
 const answerInput = document.getElementById('answerInput');
 const finishBtn = document.getElementById('finishBtn');
+const resetBtn = document.getElementById('resetBtn');
 const codeInput = document.getElementById('codeInput');
 
 let board = Array(9).fill(null);
@@ -45,8 +46,10 @@ function makeMove(idx, sym, local) {
   if (checkWin(sym)) {
     statusEl.textContent = `${sym} wins!`;
     disableBoard();
+    showReset();
   } else if (board.every(Boolean)) {
     statusEl.textContent = 'Draw';
+    showReset();
   } else {
     isMyTurn = !isMyTurn;
     statusEl.textContent = isMyTurn ? 'Your turn' : "Opponent's turn";
@@ -171,10 +174,13 @@ function setupDataChannel() {
     } else if (msg.type === 'intro') {
       remoteName = msg.name;
       updateGroupList();
+    } else if (msg.type === 'reset') {
+      resetGame(false);
     }
   };
 
   dataChannel.onclose = () => {
+    resetBtn.style.display = 'none';
     remoteName = '';
     updateGroupList();
     statusEl.textContent = 'Disconnected';
