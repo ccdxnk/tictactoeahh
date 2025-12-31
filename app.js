@@ -56,7 +56,7 @@ function makeMove(idx, sym, local) {
   }
 
   if (local && dataChannel && dataChannel.readyState === 'open') {
-    dataChannel.send(JSON.stringify({ type: 'move', idx }));
+    dataChannel.send(JSON.stringify({ type: 'move', idx, sym }));
   }
 }
 
@@ -170,7 +170,7 @@ function setupDataChannel() {
   dataChannel.onmessage = (event) => {
     const msg = JSON.parse(event.data);
     if (msg.type === 'move') {
-      makeMove(msg.idx, symbol === 'X' ? 'O' : 'X', false);
+      makeMove(msg.idx, msg.sym, false);
     } else if (msg.type === 'intro') {
       remoteName = msg.name;
       updateGroupList();
