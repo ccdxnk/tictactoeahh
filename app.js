@@ -1,5 +1,6 @@
-// TicTacToe P2P
+// TicTacToe P2P with username/group info
 const boardEl = document.getElementById('board');
+const groupListEl = document.getElementById('groupList');
 const statusEl = document.getElementById('status');
 const createBtn = document.getElementById('createBtn');
 const joinBtn = document.getElementById('joinBtn');
@@ -8,6 +9,14 @@ const codeInput = document.getElementById('codeInput');
 let board = Array(9).fill(null);
 let isMyTurn = true;
 let symbol = 'X'; // default for creator
+let myName = '';
+let remoteName = '';
+
+// Ask username once page loads
+window.addEventListener('load', () => {
+  myName = prompt('Enter your username') || 'Player';
+  updateGroupList();
+});
 
 // Generate board cells
 const cellTemplate = document.getElementById('cellTemplate');
@@ -46,6 +55,18 @@ function makeMove(idx, sym, local) {
   }
 }
 
+function updateGroupList() {
+  groupListEl.innerHTML = '';
+  const liMe = document.createElement('li');
+  liMe.textContent = myName + ' (You)';
+  groupListEl.appendChild(liMe);
+  if (remoteName) {
+    const liRemote = document.createElement('li');
+    liRemote.textContent = remoteName;
+    groupListEl.appendChild(liRemote);
+  }
+}
+
 function disableBoard() {
   [...boardEl.children].forEach(c => c.classList.add('disabled'));
 }
@@ -68,6 +89,7 @@ createBtn.addEventListener('click', async () => {
   symbol = 'X';
   isMyTurn = true;
   statusEl.textContent = 'Creating offer...';
+  updateGroupList();
   await initConnection(true);
 });
 
@@ -77,6 +99,7 @@ joinBtn.addEventListener('click', async () => {
   symbol = 'O';
   isMyTurn = false;
   statusEl.textContent = 'Joining...';
+  updateGroupList();
   await initConnection(false, code);
 });
 
@@ -115,16 +138,23 @@ async function initConnection(isCreator, remoteCode = '') {
 function setupDataChannel() {
   dataChannel.onopen = () => {
     statusEl.textContent = 'Connected!';
+    // Send intro with username
+    dataChannel.send(JSON.stringify({ type: 'intro', name: myName }));
   };
 
   dataChannel.onmessage = (event) => {
     const msg = JSON.parse(event.data);
     if (msg.type === 'move') {
       makeMove(msg.idx, symbol === 'X' ? 'O' : 'X', false);
+    } else if (msg.type === 'intro') {
+      remoteName = msg.name;
+      updateGroupList();
     }
   };
 
   dataChannel.onclose = () => {
+    remoteName = '';
+    updateGroupList();
     statusEl.textContent = 'Disconnected';
   };
 }
