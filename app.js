@@ -4,6 +4,8 @@ const groupListEl = document.getElementById('groupList');
 const statusEl = document.getElementById('status');
 const createBtn = document.getElementById('createBtn');
 const joinBtn = document.getElementById('joinBtn');
+const answerInput = document.getElementById('answerInput');
+const finishBtn = document.getElementById('finishBtn');
 const codeInput = document.getElementById('codeInput');
 
 let board = Array(9).fill(null);
@@ -86,6 +88,11 @@ let dataChannel;
 const iceServers = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
 
 createBtn.addEventListener('click', async () => {
+  // UI toggle
+  createBtn.style.display = 'none';
+  joinBtn.style.display = 'none';
+  answerInput.style.display = 'block';
+  finishBtn.style.display = 'block';
   symbol = 'X';
   isMyTurn = true;
   statusEl.textContent = 'Creating offer...';
@@ -94,6 +101,8 @@ createBtn.addEventListener('click', async () => {
 });
 
 joinBtn.addEventListener('click', async () => {
+  createBtn.style.display = 'none';
+  joinBtn.style.display = 'none';
   const code = codeInput.value.trim();
   if (!code) return alert('Please paste a code');
   symbol = 'O';
@@ -120,7 +129,11 @@ async function initConnection(isCreator, remoteCode = '') {
     if (!e.candidate) {
       const code = JSON.stringify(peerConnection.localDescription);
       navigator.clipboard.writeText(code);
-      statusEl.textContent = 'Code copied! Send to friend.';
+      if (isCreator) {
+        statusEl.textContent = 'Offer copied! Waiting for answer...';
+      } else {
+        statusEl.textContent = 'Answer copied! Send to friend.';
+      }
     }
   };
 
@@ -133,6 +146,15 @@ async function initConnection(isCreator, remoteCode = '') {
     const answer = await peerConnection.createAnswer();
     await peerConnection.setLocalDescription(answer);
   }
+
+  // Creator completes connection when they receive answer
+  finishBtn.onclick = async () => {
+    const ans = answerInput.value.trim();
+    if (!ans) return alert('Paste answer first');
+    const ansDesc = new RTCSessionDescription(JSON.parse(ans));
+    await peerConnection.setRemoteDescription(ansDesc);
+    statusEl.textContent = 'Connecting...';
+  };
 }
 
 function setupDataChannel() {
