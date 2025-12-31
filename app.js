@@ -47,9 +47,15 @@ function makeMove(idx, sym, local) {
     statusEl.textContent = `${sym} wins!`;
     disableBoard();
     showReset();
+    if (local && dataChannel.readyState === 'open') {
+      dataChannel.send(JSON.stringify({ type: 'result', winner: sym }));
+    }
   } else if (board.every(Boolean)) {
     statusEl.textContent = 'Draw';
     showReset();
+    if (local && dataChannel.readyState === 'open') {
+      dataChannel.send(JSON.stringify({ type: 'result', winner: 'draw' }));
+    }
   } else {
     isMyTurn = !isMyTurn;
     statusEl.textContent = isMyTurn ? 'Your turn' : "Opponent's turn";
@@ -176,6 +182,14 @@ function setupDataChannel() {
       updateGroupList();
     } else if (msg.type === 'reset') {
       resetGame(false);
+    } else if (msg.type === 'result') {
+      if (msg.winner === 'draw') {
+        statusEl.textContent = 'Draw';
+      } else {
+        statusEl.textContent = `${msg.winner} wins!`;
+      }
+      disableBoard();
+      showReset();
     }
   };
 
@@ -186,3 +200,4 @@ function setupDataChannel() {
     statusEl.textContent = 'Disconnected';
   };
 }
+
