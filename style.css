@@ -75,10 +75,37 @@ body {
   opacity: 0.9;
 }
 
+.content {
+  display: flex;
+  gap: 20px;
+}
+
 .board {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 6px;
+}
+
+.side {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  padding: 16px;
+  width: 140px;
+}
+
+.side h2 {
+  margin-bottom: 8px;
+  font-size: 1rem;
+  text-align: center;
+}
+
+.side ul {
+  list-style: none;
+}
+
+.side li {
+  margin-bottom: 6px;
+  text-align: center;
 }
 
 .cell {
